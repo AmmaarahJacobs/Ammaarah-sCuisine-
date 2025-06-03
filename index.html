@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ammaarah's Cuisine</title>
+    <link rel="icon" href="img/Screenshot 2025-06-03 205248.png">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #e69393;
+            --secondary: #7eb4b0;
+            --accent: #f9eaa2;
+            --dark: #a7daa7;;
+            --light: #a7daa7;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--light);
+            color: var(--dark);
+            overflow-x: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('img/download.jpeg') center/cover;
+            opacity: 0.3;
+            z-index: 0;
+        }
+        
+        header h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            position: relative;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        header p {
+            font-size: 1.2rem;
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        
+        .menu {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+        
+        .menu-item {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            perspective: 1000px;
+            transform-style: preserve-3d;
+        }
+        
+        .menu-item:hover {
+            transform: translateY(-10px) rotateY(5deg);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+        }
+        
+        .food-image {
+            height: 200px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .food-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+        
+        .menu-item:hover .food-image img {
+            transform: scale(1.1) rotate(2deg);
+        }
+        
+        .food-details {
+            padding: 1.5rem;
+        }
+        
+        .food-details h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+        }
+        
+        .food-details p {
+            margin-bottom: 1rem;
+            color: #666;
+        }
+        
+        .price {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--secondary);
+            margin-bottom: 1rem;
+        }
+        
+        .quantity-selector {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .quantity-selector button {
+            background: var(--accent);
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .quantity-selector button:hover {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .quantity-selector input {
+            width: 50px;
+            text-align: center;
+            margin: 0 10px;
+            font-size: 1.2rem;
+            border: 2px solid #eee;
+            border-radius: 5px;
+        }
+        
+        .add-to-cart {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.3s;
+            width: 100%;
+        }
+        
+        .add-to-cart:hover {
+            background: #ff5252;
+            transform: translateY(-3px);
+        }
+        
+        .cart {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            padding: 1.5rem;
+            width: 350px;
+            transform: translateY(20px);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            z-index: 100;
+        }
+        
+        .cart.active {
+            transform: translateY(0);
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .cart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .cart-header h3 {
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+        
+        .close-cart {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+        }
+        
+        .cart-items {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 1rem;
+        }
+        
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .cart-item-info {
+            flex: 1;
+        }
+        
+        .cart-item-name {
+            font-weight: bold;
+        }
+        
+        .cart-item-price {
+            color: var(--secondary);
+        }
+        
+        .remove-item {
+            background: none;
+            border: none;
+            color: #ff5252;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+        
+        .cart-total {
+            font-size: 1.3rem;
+            font-weight: bold;
+            text-align: right;
+            margin-top: 1rem;
+        }
+        
+        .checkout-btn {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+            width: 100%;
+            margin-top: 1rem;
+        }
+        
+        .checkout-btn:hover {
+            background: #3dbeb6;
+        }
+        
+        .cart-icon {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--primary);
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            z-index: 99;
+            transition: transform 0.3s;
+        }
+        
+        .cart-icon:hover {
+            transform: scale(1.1);
+        }
+        
+        .cart-count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--accent);
+            color: var(--dark);
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        @keyframes rotate {
+            0% { transform: rotateY(0); }
+            100% { transform: rotateY(360deg); }
+        }
+        
+        .rotating {
+            animation: rotate 10s infinite linear;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 2rem;
+            background: var(--dark);
+            color: white;
+            margin-top: 3rem;
+        }
+        
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2rem;
+            }
+            
+            .menu {
+                grid-template-columns: 1fr;
+            }
+            
+            .cart {
+                width: 90%;
+                left: 5%;
+                right: 5%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Ammaarah's Cuisine</h1>
+        <p>Delicious homemade rotis and vetkoek made with love and traditional recipes. Order now and taste the difference!</p>
+    </header>
+    
+    <div class="container">
+        <div class="menu">
+            <div class="menu-item">
+                <div class="food-image">
+                    <img src="img/Screenshot 2025-06-03 203445.png" alt="Roti 6 Pack" class="rotating">
+                </div>
+                <div class="food-details">
+                    <h3>Roti 6 Pack</h3>
+                    <p>Six soft and fluffy rotis perfect for any meal. Made fresh daily with premium ingredients.</p>
+                    <div class="price">R30</div>
+                    <div class="quantity-selector">
+                        <button class="decrease">-</button>
+                        <input type="number" value="0" min="0" class="quantity">
+                        <button class="increase">+</button>
+                    </div>
+                    <button class="add-to-cart" data-name="Roti 6 Pack" data-price="30">Add to Cart</button>
+                </div>
+            </div>
+
+            <div class="menu-item">
+                <div class="food-image">
+                    <img src="img/Screenshot 2025-06-03 203926.png" alt="Vetkoek 10 Pack" class="rotating">
+                </div>
+                <div class="food-details">
+                    <h3>Vetkoek 10 Pack</h3>
+                    <p>Ten golden, crispy vetkoek that are perfect with any filling or just on their own.</p>
+                    <div class="price">R55</div>
+                    <div class="quantity-selector">
+                        <button class="decrease">-</button>
+                        <input type="number" value="0" min="0" class="quantity">
+                        <button class="increase">+</button>
+                    </div>
+                    <button class="add-to-cart" data-name="Vetkoek 10 Pack" data-price="55">Add to Cart</button>
+                </div>
+            </div>
+            
+            <div class="menu-item">
+                <div class="food-image">
+                    <img src="img/Screenshot 2025-06-03 203815.png" alt="Roti 12 Pack" class="rotating">
+                </div>
+                <div class="food-details">
+                    <h3>Roti 12 Pack</h3>
+                    <p>Twice the deliciousness! Twelve fresh rotis for larger families or family gatherings.</p>
+                    <div class="price">R60</div>
+                    <div class="quantity-selector">
+                        <button class="decrease">-</button>
+                        <input type="number" value="0" min="0" class="quantity">
+                        <button class="increase">+</button>
+                    </div>
+                    <button class="add-to-cart" data-name="Roti 12 Pack" data-price="60">Add to Cart</button>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+    
+    <div class="cart-icon">
+        🛒
+        <span class="cart-count">0</span>
+    </div>
+    
+    <div class="cart">
+        <div class="cart-header">
+            <h3>Your Order</h3>
+            <button class="close-cart">×</button>
+        </div>
+        <div class="cart-items">
+            <!-- Cart items will be added here dynamically -->
+        </div>
+        <div class="cart-total">
+            Total: R<span class="total-amount">0</span>
+        </div>
+        <button class="checkout-btn">Checkout via WhatsApp</button>
+    </div>
+    
+    <footer>
+        <p>Ammaarah's Cuisine © 2025. All rights reserved.</p>
+    </footer>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const cartIcon = document.querySelector('.cart-icon');
+            const cart = document.querySelector('.cart');
+            const closeCart = document.querySelector('.close-cart');
+            const cartItemsContainer = document.querySelector('.cart-items');
+            const cartCount = document.querySelector('.cart-count');
+            const totalAmount = document.querySelector('.total-amount');
+            const checkoutBtn = document.querySelector('.checkout-btn');
+            
+            const whatsappNumber = "+27748361519"; 
+            
+            let cartItems = [];
+            
+            // Toggle cart visibility
+            cartIcon.addEventListener('click', () => {
+                cart.classList.add('active');
+            });
+            
+            closeCart.addEventListener('click', () => {
+                cart.classList.remove('active');
+            });
+            
+            // Quantity selectors
+            document.querySelectorAll('.quantity-selector').forEach(selector => {
+                const decrease = selector.querySelector('.decrease');
+                const increase = selector.querySelector('.increase');
+                const quantityInput = selector.querySelector('.quantity');
+                
+                decrease.addEventListener('click', () => {
+                    let value = parseInt(quantityInput.value);
+                    if (value > 0) {
+                        quantityInput.value = value - 1;
+                    }
+                });
+                
+                increase.addEventListener('click', () => {
+                    let value = parseInt(quantityInput.value);
+                    quantityInput.value = value + 1;
+                });
+            });
+            
+            // Add to cart functionality
+            document.querySelectorAll('.add-to-cart').forEach(button => {
+                button.addEventListener('click', () => {
+                    const parent = button.closest('.menu-item');
+                    const quantity = parseInt(parent.querySelector('.quantity').value);
+                    
+                    if (quantity > 0) {
+                        const name = button.getAttribute('data-name');
+                        const price = parseFloat(button.getAttribute('data-price'));
+                        
+                        // Check if item already in cart
+                        const existingItemIndex = cartItems.findIndex(item => item.name === name);
+                        
+                        if (existingItemIndex >= 0) {
+                            cartItems[existingItemIndex].quantity += quantity;
+                        } else {
+                            cartItems.push({
+                                name,
+                                price,
+                                quantity
+                            });
+                        }
+                        
+                        updateCart();
+                        parent.querySelector('.quantity').value = 0;
+                        
+                        // Show cart
+                        cart.classList.add('active');
+                    }
+                });
+            });
+            
+            // Update cart display
+            function updateCart() {
+                // Clear cart items
+                cartItemsContainer.innerHTML = '';
+                
+                let total = 0;
+                let itemCount = 0;
+                
+                // Add each item to cart
+                cartItems.forEach((item, index) => {
+                    const itemTotal = item.price * item.quantity;
+                    total += itemTotal;
+                    itemCount += item.quantity;
+                    
+                    const cartItemElement = document.createElement('div');
+                    cartItemElement.classList.add('cart-item');
+                    cartItemElement.innerHTML = `
+                        <div class="cart-item-info">
+                            <div class="cart-item-name">${item.name}</div>
+                            <div class="cart-item-price">R${item.price} × ${item.quantity}</div>
+                        </div>
+                        <div class="cart-item-total">R${itemTotal}</div>
+                        <button class="remove-item" data-index="${index}">×</button>
+                    `;
+                    
+                    cartItemsContainer.appendChild(cartItemElement);
+                });
+                
+                // Update total and count
+                totalAmount.textContent = total.toFixed(2);
+                cartCount.textContent = itemCount;
+                
+                // Add event listeners to remove buttons
+                document.querySelectorAll('.remove-item').forEach(button => {
+                    button.addEventListener('click', () => {
+                        const index = parseInt(button.getAttribute('data-index'));
+                        cartItems.splice(index, 1);
+                        updateCart();
+                    });
+                });
+            }
+            
+            // Checkout functionality
+            checkoutBtn.addEventListener('click', () => {
+                if (cartItems.length === 0) {
+                    alert('Your cart is empty!');
+                    return;
+                }
+                
+                // Format WhatsApp message
+                let message = `Hi! I'd like to place an order:\n\n`;
+                
+                cartItems.forEach(item => {
+                    message += `${item.name} × ${item.quantity} = R${item.price * item.quantity}\n`;
+                });
+                
+                message += `\nTotal: R${totalAmount.textContent}\n\n`;
+                message += `Please confirm my order. Thank you!`;
+                
+                // Encode message for URL
+                const encodedMessage = encodeURIComponent(message);
+                
+                // Open WhatsApp
+                window.open(`https://wa.me/${whatsappNumber}?text=${encodedMessage}`, '_blank');
+                
+                // Clear cart
+                cartItems = [];
+                updateCart();
+                cart.classList.remove('active');
+            });
+            
+            // 3D hover effect for menu items
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.addEventListener('mousemove', (e) => {
+                    const xAxis = (window.innerWidth / 2 - e.pageX) / 25;
+                    const yAxis = (window.innerHeight / 2 - e.pageY) / 25;
+                    item.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+                });
+                
+                item.addEventListener('mouseenter', () => {
+                    item.style.transition = 'none';
+                });
+                
+                item.addEventListener('mouseleave', () => {
+                    item.style.transition = 'all 0.5s ease';
+                    item.style.transform = 'rotateY(0deg) rotateX(0deg)';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
