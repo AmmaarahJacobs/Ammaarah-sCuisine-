@@ -117,37 +117,6 @@
             margin-bottom: 1rem;
         }
         
-        .quantity-selector {
-            display: flex;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-        
-        .quantity-selector button {
-            background: var(--accent);
-            border: none;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            font-size: 1.2rem;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-        
-        .quantity-selector button:hover {
-            background: var(--primary);
-            color: white;
-        }
-        
-        .quantity-selector input {
-            width: 50px;
-            text-align: center;
-            margin: 0 10px;
-            font-size: 1.2rem;
-            border: 2px solid #eee;
-            border-radius: 5px;
-        }
-        
         .add-to-cart {
             background: var(--primary);
             color: white;
@@ -232,6 +201,38 @@
         
         .cart-item-price {
             color: var(--secondary);
+            margin: 5px 0;
+        }
+        
+        .cart-item-quantity {
+            display: flex;
+            align-items: center;
+            margin-top: 5px;
+        }
+        
+        .cart-item-quantity button {
+            background: var(--accent);
+            border: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .cart-item-quantity button:hover {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .cart-item-quantity input {
+            width: 40px;
+            text-align: center;
+            margin: 0 5px;
+            font-size: 1rem;
+            border: 2px solid #eee;
+            border-radius: 5px;
         }
         
         .remove-item {
@@ -240,6 +241,7 @@
             color: #ff5252;
             cursor: pointer;
             font-size: 1.2rem;
+            margin-left: 10px;
         }
         
         .cart-total {
@@ -356,11 +358,6 @@
                     <h3>Roti 6 Pack</h3>
                     <p>Six soft and fluffy rotis perfect for any meal. Made fresh daily with premium ingredients.</p>
                     <div class="price">R30</div>
-                    <div class="quantity-selector">
-                        <button class="decrease">-</button>
-                        <input type="number" value="0" min="0" class="quantity">
-                        <button class="increase">+</button>
-                    </div>
                     <button class="add-to-cart" data-name="Roti 6 Pack" data-price="30">Add to Cart</button>
                 </div>
             </div>
@@ -373,11 +370,6 @@
                     <h3>Vetkoek 10 Pack</h3>
                     <p>Ten golden, plain crispy vetkoek that are perfect for any occasion and season.</p>
                     <div class="price">R55</div>
-                    <div class="quantity-selector">
-                        <button class="decrease">-</button>
-                        <input type="number" value="0" min="0" class="quantity">
-                        <button class="increase">+</button>
-                    </div>
                     <button class="add-to-cart" data-name="Vetkoek 10 Pack" data-price="55">Add to Cart</button>
                 </div>
             </div>
@@ -390,11 +382,6 @@
                     <h3>Roti 12 Pack</h3>
                     <p>Twice the deliciousness! Twelve fresh rotis for larger families or family gatherings.</p>
                     <div class="price">R60</div>
-                    <div class="quantity-selector">
-                        <button class="decrease">-</button>
-                        <input type="number" value="0" min="0" class="quantity">
-                        <button class="increase">+</button>
-                    </div>
                     <button class="add-to-cart" data-name="Roti 12 Pack" data-price="60">Add to Cart</button>
                 </div>
             </div>
@@ -448,54 +435,31 @@
                 cart.classList.remove('active');
             });
             
-            // Quantity selectors
-            document.querySelectorAll('.quantity-selector').forEach(selector => {
-                const decrease = selector.querySelector('.decrease');
-                const increase = selector.querySelector('.increase');
-                const quantityInput = selector.querySelector('.quantity');
-                
-                decrease.addEventListener('click', () => {
-                    let value = parseInt(quantityInput.value);
-                    if (value > 0) {
-                        quantityInput.value = value - 1;
-                    }
-                });
-                
-                increase.addEventListener('click', () => {
-                    let value = parseInt(quantityInput.value);
-                    quantityInput.value = value + 1;
-                });
-            });
-            
             // Add to cart functionality
             document.querySelectorAll('.add-to-cart').forEach(button => {
                 button.addEventListener('click', () => {
-                    const parent = button.closest('.menu-item');
-                    const quantity = parseInt(parent.querySelector('.quantity').value);
+                    const name = button.getAttribute('data-name');
+                    const price = parseFloat(button.getAttribute('data-price'));
                     
-                    if (quantity > 0) {
-                        const name = button.getAttribute('data-name');
-                        const price = parseFloat(button.getAttribute('data-price'));
-                        
-                        // Check if item already in cart
-                        const existingItemIndex = cartItems.findIndex(item => item.name === name);
-                        
-                        if (existingItemIndex >= 0) {
-                            cartItems[existingItemIndex].quantity += quantity;
-                        } else {
-                            cartItems.push({
-                                name,
-                                price,
-                                quantity
-                            });
-                        }
-                        
-                        updateCart();
-                        parent.querySelector('.quantity').value = 0;
-                        
-                        // Show cart
-                        cart.classList.add('active');
+                    // Check if item already in cart
+                    const existingItemIndex = cartItems.findIndex(item => item.name === name);
+                    
+                    if (existingItemIndex >= 0) {
+                        // If item exists, increase quantity by 1
+                        cartItems[existingItemIndex].quantity += 1;
+                    } else {
+                        // If new item, add to cart with quantity 1
+                        cartItems.push({
+                            name,
+                            price,
+                            quantity: 1
+                        });
                     }
+                    
+                    updateCart();
+                    
+                    // Show cart
+                    cart.classList.add('active');
                 });
             });
             
@@ -518,9 +482,14 @@
                     cartItemElement.innerHTML = `
                         <div class="cart-item-info">
                             <div class="cart-item-name">${item.name}</div>
-                            <div class="cart-item-price">R${item.price} × ${item.quantity}</div>
+                            <div class="cart-item-price">R${item.price} each</div>
+                            <div class="cart-item-quantity">
+                                <button class="decrease-quantity" data-index="${index}">-</button>
+                                <input type="number" value="${item.quantity}" min="1" class="item-quantity" data-index="${index}">
+                                <button class="increase-quantity" data-index="${index}">+</button>
+                            </div>
                         </div>
-                        <div class="cart-item-total">R${itemTotal}</div>
+                        <div class="cart-item-total">R${itemTotal.toFixed(2)}</div>
                         <button class="remove-item" data-index="${index}">×</button>
                     `;
                     
@@ -530,6 +499,38 @@
                 // Update total and count
                 totalAmount.textContent = total.toFixed(2);
                 cartCount.textContent = itemCount;
+                
+                // Add event listeners to quantity controls
+                document.querySelectorAll('.decrease-quantity').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const index = parseInt(button.getAttribute('data-index'));
+                        if (cartItems[index].quantity > 1) {
+                            cartItems[index].quantity -= 1;
+                            updateCart();
+                        }
+                    });
+                });
+                
+                document.querySelectorAll('.increase-quantity').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const index = parseInt(button.getAttribute('data-index'));
+                        cartItems[index].quantity += 1;
+                        updateCart();
+                    });
+                });
+                
+                document.querySelectorAll('.item-quantity').forEach(input => {
+                    input.addEventListener('change', (e) => {
+                        const index = parseInt(input.getAttribute('data-index'));
+                        const newQuantity = parseInt(input.value);
+                        if (newQuantity >= 1) {
+                            cartItems[index].quantity = newQuantity;
+                            updateCart();
+                        } else {
+                            input.value = cartItems[index].quantity; // revert if invalid
+                        }
+                    });
+                });
                 
                 // Add event listeners to remove buttons
                 document.querySelectorAll('.remove-item').forEach(button => {
