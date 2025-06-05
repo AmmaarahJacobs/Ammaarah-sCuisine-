@@ -269,24 +269,6 @@
             background: #3dbeb6;
         }
         
-        .play-game-btn {
-            background: var(--accent);
-            color: var(--dark);
-            border: none;
-            padding: 0.8rem;
-            border-radius: 50px;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.3s;
-            width: 100%;
-            margin-top: 0.5rem;
-        }
-        
-        .play-game-btn:hover {
-            background: #f0d87a;
-        }
-        
         .cart-icon {
             position: fixed;
             bottom: 2rem;
@@ -324,85 +306,6 @@
             align-items: center;
             font-size: 0.8rem;
             font-weight: bold;
-        }
-        
-        /* Game Modal Styles */
-        .game-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.8);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s;
-        }
-        
-        .game-modal.active {
-            opacity: 1;
-            visibility: visible;
-        }
-        
-        .game-container {
-            background: white;
-            border-radius: 15px;
-            padding: 2rem;
-            width: 90%;
-            max-width: 500px;
-            text-align: center;
-            position: relative;
-        }
-        
-        .close-game {
-            position: absolute;
-            top: 10px;
-            right: 15px;
-            font-size: 1.5rem;
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: #666;
-        }
-        
-        .game-title {
-            color: var(--primary);
-            margin-bottom: 1rem;
-        }
-        
-        .game-canvas {
-            background: #f5f5f5;
-            border-radius: 10px;
-            margin: 1rem auto;
-            display: block;
-            max-width: 100%;
-        }
-        
-        .game-score {
-            font-size: 1.2rem;
-            margin: 1rem 0;
-            color: var(--secondary);
-            font-weight: bold;
-        }
-        
-        .game-instructions {
-            color: #666;
-            margin-bottom: 1rem;
-            font-size: 0.9rem;
-        }
-        
-        /* Added animation for cart count */
-        @keyframes bounce {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.3); }
-        }
-        
-        .cart-count.added {
-            animation: bounce 0.3s;
         }
         
         @keyframes rotate {
@@ -503,19 +406,6 @@
             Total: R<span class="total-amount">0</span>
         </div>
         <button class="checkout-btn">Checkout via WhatsApp</button>
-        <button class="play-game-btn">Play While You Wait</button>
-    </div>
-    
-    <!-- Game Modal -->
-    <div class="game-modal">
-        <div class="game-container">
-            <button class="close-game">×</button>
-            <h2 class="game-title">Catch the Roti!</h2>
-            <p class="game-instructions">Use the left and right arrow keys to move the basket and catch falling rotis. Don't let them hit the ground!</p>
-            <canvas id="gameCanvas" width="400" height="500" class="game-canvas"></canvas>
-            <div class="game-score">Score: <span id="score">0</span></div>
-            <button id="startGame" class="add-to-cart">Start Game</button>
-        </div>
     </div>
     
     <footer>
@@ -531,9 +421,6 @@
             const cartCount = document.querySelector('.cart-count');
             const totalAmount = document.querySelector('.total-amount');
             const checkoutBtn = document.querySelector('.checkout-btn');
-            const playGameBtn = document.querySelector('.play-game-btn');
-            const gameModal = document.querySelector('.game-modal');
-            const closeGame = document.querySelector('.close-game');
             
             const whatsappNumber = "+27748361519"; 
             
@@ -571,11 +458,8 @@
                     
                     updateCart();
                     
-                    // Show visual feedback instead of opening cart
-                    cartCount.classList.add('added');
-                    setTimeout(() => {
-                        cartCount.classList.remove('added');
-                    }, 300);
+                    // Show cart
+                    cart.classList.add('active');
                 });
             });
             
@@ -686,148 +570,6 @@
                 updateCart();
                 cart.classList.remove('active');
             });
-            
-            // Game functionality
-            playGameBtn.addEventListener('click', () => {
-                gameModal.classList.add('active');
-                cart.classList.remove('active');
-            });
-            
-            closeGame.addEventListener('click', () => {
-                gameModal.classList.remove('active');
-                resetGame();
-            });
-            
-            // Game variables
-            let gameActive = false;
-            let score = 0;
-            const canvas = document.getElementById('gameCanvas');
-            const ctx = canvas.getContext('2d');
-            const scoreDisplay = document.getElementById('score');
-            const startGameBtn = document.getElementById('startGame');
-            
-            // Game objects
-            const basket = {
-                x: canvas.width / 2 - 50,
-                y: canvas.height - 30,
-                width: 100,
-                height: 20,
-                speed: 8,
-                color: '#e69393',
-                moveLeft: false,
-                moveRight: false
-            };
-            
-            let rotis = [];
-            let lastRotiTime = 0;
-            const rotiSpeed = 3;
-            const rotiRadius = 20;
-            
-            // Game controls
-            window.addEventListener('keydown', (e) => {
-                if (e.key === 'ArrowLeft') basket.moveLeft = true;
-                if (e.key === 'ArrowRight') basket.moveRight = true;
-            });
-            
-            window.addEventListener('keyup', (e) => {
-                if (e.key === 'ArrowLeft') basket.moveLeft = false;
-                if (e.key === 'ArrowRight') basket.moveRight = false;
-            });
-            
-            // Start game
-            startGameBtn.addEventListener('click', () => {
-                if (!gameActive) {
-                    gameActive = true;
-                    score = 0;
-                    rotis = [];
-                    scoreDisplay.textContent = score;
-                    startGameBtn.textContent = 'Restart Game';
-                    gameLoop();
-                } else {
-                    // Restart game
-                    resetGame();
-                    gameActive = true;
-                    score = 0;
-                    rotis = [];
-                    scoreDisplay.textContent = score;
-                    gameLoop();
-                }
-            });
-            
-            function resetGame() {
-                gameActive = false;
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                startGameBtn.textContent = 'Start Game';
-            }
-            
-            function gameLoop() {
-                if (!gameActive) return;
-                
-                // Clear canvas
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                
-                // Move basket
-                if (basket.moveLeft && basket.x > 0) {
-                    basket.x -= basket.speed;
-                }
-                if (basket.moveRight && basket.x < canvas.width - basket.width) {
-                    basket.x += basket.speed;
-                }
-                
-                // Draw basket
-                ctx.fillStyle = basket.color;
-                ctx.fillRect(basket.x, basket.y, basket.width, basket.height);
-                
-                // Create new rotis
-                const currentTime = Date.now();
-                if (currentTime - lastRotiTime > 1000) { // Every second
-                    rotis.push({
-                        x: Math.random() * (canvas.width - rotiRadius * 2) + rotiRadius,
-                        y: -rotiRadius,
-                        radius: rotiRadius,
-                        speed: rotiSpeed + Math.random() * 2
-                    });
-                    lastRotiTime = currentTime;
-                }
-                
-                // Update and draw rotis
-                for (let i = rotis.length - 1; i >= 0; i--) {
-                    const roti = rotis[i];
-                    roti.y += roti.speed;
-                    
-                    // Draw roti
-                    ctx.beginPath();
-                    ctx.arc(roti.x, roti.y, roti.radius, 0, Math.PI * 2);
-                    ctx.fillStyle = '#f9eaa2';
-                    ctx.fill();
-                    ctx.strokeStyle = '#e69393';
-                    ctx.lineWidth = 3;
-                    ctx.stroke();
-                    
-                    // Check if caught by basket
-                    if (
-                        roti.y + roti.radius > basket.y &&
-                        roti.x > basket.x &&
-                        roti.x < basket.x + basket.width
-                    ) {
-                        rotis.splice(i, 1);
-                        score++;
-                        scoreDisplay.textContent = score;
-                    }
-                    
-                    // Check if missed (hit bottom)
-                    else if (roti.y - roti.radius > canvas.height) {
-                        rotis.splice(i, 1);
-                        // End game if missed
-                        gameActive = false;
-                        alert(`Game Over! Your score: ${score}`);
-                        resetGame();
-                    }
-                }
-                
-                // Continue game loop
-                requestAnimationFrame(gameLoop);
-            }
         });
     </script>
 </body>
